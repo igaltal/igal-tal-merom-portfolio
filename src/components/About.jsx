@@ -64,7 +64,7 @@ export default function About() {
             <div className="relative">
               <div className="absolute -top-4 -left-4 w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-50"></div>
               <img 
-                src="/assets/images/igal-photo.jpg" 
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" 
                 alt="Igal Tal Merom"
                 className="relative w-48 h-48 rounded-2xl object-cover shadow-2xl mb-8"
               />

@@ -58,7 +58,7 @@ export default function Hero() {
             <div className="relative inline-block">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-lg opacity-50 animate-pulse"></div>
               <img 
-                src="/assets/images/igal-photo.jpg" 
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face" 
                 alt="Igal Tal Merom"
                 className="relative w-40 h-40 rounded-full object-cover border-4 border-white/20 shadow-2xl"
               />
