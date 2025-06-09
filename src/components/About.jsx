@@ -75,7 +75,7 @@ export default function About() {
             
             <div className="space-y-4 md:space-y-6 text-slate-700 leading-relaxed text-center lg:text-left">
               <p className="text-base md:text-lg">
-                I'm a 25-year-old software developer and Computer Science & Entrepreneurship student at Reichman University, passionate about building innovative solutions that make a real impact.
+                I'm a 26-year-old software developer and Computer Science & Entrepreneurship student at Reichman University, passionate about building innovative solutions that make a real impact.
               </p>
               <p className="text-sm md:text-base">
                 Currently working as a <span className="font-semibold text-blue-600">Junior Software Developer at Voltify</span>, where I contribute to real-time infrastructure and industrial systems, gaining valuable experience in scalable system architecture.
