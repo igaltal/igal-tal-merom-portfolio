@@ -2,10 +2,10 @@
 
 Modern, responsive portfolio website built with React, Vite, and Tailwind CSS.
 
-## 🚀 Live Demo
+## Live Demo
 [https://igaltal.github.io/igal-tal-merom-portfolio/](https://igaltal.github.io/igal-tal-merom-portfolio/)
 
-## 📁 How to Add Your Personal Files
+## How to Add Your Personal Files
 
 ### Profile Photo
 1. Add your profile photo to: `public/assets/images/profile-photo.jpg`
@@ -17,7 +17,7 @@ Modern, responsive portfolio website built with React, Vite, and Tailwind CSS.
 1. Add your resume PDF to: `public/assets/documents/Igal_Tal_Merom_Resume.pdf`
 2. Make sure the file is named exactly `Igal_Tal_Merom_Resume.pdf`
 
-## 🛠️ Development
+## Development
 
 ### Prerequisites
 - Node.js 18+ 
@@ -43,21 +43,15 @@ npm run build
 npm run deploy
 ```
 
-## 📧 Contact Configuration
+## Contact Configuration
 To enable the contact form, you need to set up EmailJS:
 1. Sign up at [EmailJS](https://www.emailjs.com/)
 2. Create a service and template
 3. Update the EmailJS credentials in `src/components/Contact.jsx`
 
-## 🎨 Features
-- ✅ Modern, dark-themed design
-- ✅ Fully responsive layout
-- ✅ Smooth animations with Framer Motion
-- ✅ Working contact form (with EmailJS setup)
-- ✅ GitHub Pages deployment ready
-- ✅ SEO optimized
 
-## 📱 Sections
+
+## Sections
 - **Hero** - Introduction with profile photo
 - **About** - Background and skills
 - **Projects** - GitHub projects showcase
