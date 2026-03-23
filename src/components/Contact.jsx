@@ -59,8 +59,8 @@ export default function Contact() {
     {
       icon: <Mail className="w-5 h-5 md:w-6 md:h-6" />,
       label: "Email",
-      value: "talm13124@gmail.com",
-      href: "mailto:talm13124@gmail.com"
+      value: "igaltalmerom@gmail.com",
+      href: "mailto:igaltalmerom@gmail.com"
     },
     {
       icon: <Phone className="w-5 h-5 md:w-6 md:h-6" />,
@@ -71,7 +71,7 @@ export default function Contact() {
     {
       icon: <MapPin className="w-5 h-5 md:w-6 md:h-6" />,
       label: "Location",
-      value: "Israel",
+      value: "Kiryat Ono, Israel",
       href: null
     }
   ];

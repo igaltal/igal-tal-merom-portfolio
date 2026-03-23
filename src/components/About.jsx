@@ -6,32 +6,32 @@ import { Code, Rocket, Users, Zap } from "lucide-react";
 
 export default function About() {
   const skills = [
-    { category: "Languages", items: ["Python", "Java", "C#", "JavaScript"] },
-    { category: "Frontend", items: ["React", "HTML/CSS", "Tailwind CSS", "Vue.js"] },
-    { category: "Backend", items: ["Flask", "Django", "Node.js", "SQLite"] },
-    { category: "Tools", items: ["Git", "Docker", "Selenium", "Firebase"] }
+    { category: "Languages", items: ["Python", "C++", "C", "C#", "Java", "SQL"] },
+    { category: "Frameworks & Tools", items: ["React", "Flask", "Docker", "Pytest", "Git", "Linux", "Selenium", "SQLite"] },
+    { category: "Protocols & Systems", items: ["Modbus", "Redis", "TCP/IP", "RS-485"] },
+    { category: "AI & ML", items: ["OpenAI APIs", "Scikit-learn", "OpenCV", "Prompt Engineering", "Computer Vision"] }
   ];
 
   const highlights = [
     {
       icon: <Code className="w-5 h-5 md:w-6 md:h-6" />,
-      title: "Software Developer",
-      description: "Junior Software Developer at Voltify working with real-time systems"
-    },
-    {
-      icon: <Users className="w-5 h-5 md:w-6 md:h-6" />,
-      title: "Academic Coordinator",
-      description: "Managing Computer Science track activities at Reichman University"
-    },
-    {
-      icon: <Rocket className="w-5 h-5 md:w-6 md:h-6" />,
-      title: "Entrepreneur",
-      description: "Developing innovative AI-powered applications and solutions"
+      title: "Software Engineer @ Voltify",
+      description: "Designing simulation platforms and communication layers for distributed control systems"
     },
     {
       icon: <Zap className="w-5 h-5 md:w-6 md:h-6" />,
+      title: "Distributed Systems",
+      description: "Real-time infrastructure, multi-threading, async systems, and production debugging"
+    },
+    {
+      icon: <Rocket className="w-5 h-5 md:w-6 md:h-6" />,
+      title: "Builder & Entrepreneur",
+      description: "CS & Entrepreneurship graduate building AI-powered and automation tools"
+    },
+    {
+      icon: <Users className="w-5 h-5 md:w-6 md:h-6" />,
       title: "Military Background",
-      description: "Former combat soldier and instructor in Israeli Air Force"
+      description: "Combat Soldiers Instructor in the Israeli Air Force — leadership and precision"
     }
   ];
 
@@ -75,16 +75,16 @@ export default function About() {
             
             <div className="space-y-4 md:space-y-6 text-slate-700 leading-relaxed text-center lg:text-left">
               <p className="text-base md:text-lg">
-                I'm a 26-year-old software developer and Computer Science & Entrepreneurship student at Reichman University, passionate about building innovative solutions that make a real impact.
+                Software Engineer specializing in distributed systems and real-time infrastructure, with hands-on experience in Python and C++. I graduated with a B.Sc. in Computer Science & Entrepreneurship from Reichman University.
               </p>
               <p className="text-sm md:text-base">
-                Currently working as a <span className="font-semibold text-blue-600">Junior Software Developer at Voltify</span>, where I contribute to real-time infrastructure and industrial systems, gaining valuable experience in scalable system architecture.
+                At <span className="font-semibold text-blue-600">Voltify</span>, I'm responsible for designing and owning a simulation platform and communication layers, enabling validation of complex system behavior before production deployment. I work with Python, C++, Redis, Modbus, and Docker in a Linux environment.
               </p>
               <p className="text-sm md:text-base">
-                I also serve as the <span className="font-semibold">Academic Coordinator for the Computer Science track</span> at my university, where I strengthen connections between students and faculty while organizing events and supporting student success.
+                I have a strong background in <span className="font-semibold">performance optimization</span>, production debugging, multi-threaded systems, and CI/CD pipelines (Pytest, Docker, Bitbucket).
               </p>
               <p className="text-sm md:text-base">
-                My journey includes military service as a combat soldier and instructor in the Israeli Air Force, and professional experience at the Israeli Consulate and UN Mission in New York, where I handled logistics and event management for diplomatic operations.
+                My journey includes serving as a <span className="font-semibold">Combat Soldiers Instructor</span> in the Israeli Air Force and professional experience at the Israeli Consulate in New York, where I handled logistics for high-profile diplomatic operations.
               </p>
             </div>
           </motion.div>

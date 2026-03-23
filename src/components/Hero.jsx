@@ -92,7 +92,7 @@ export default function Hero() {
                 transition={{ duration: 2, repeat: Infinity }}
                 className="w-2 md:w-3 h-2 md:h-3 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full flex-shrink-0"
               />
-              <span className="text-sm md:text-xl text-white font-medium">Junior Software Developer @ Voltify</span>
+              <span className="text-sm md:text-xl text-white font-medium">Software Engineer @ Voltify</span>
             </div>
           </motion.div>
 
@@ -103,9 +103,9 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.5 }}
             className="text-lg md:text-xl lg:text-2xl text-slate-300 mb-8 md:mb-12 max-w-4xl mx-auto leading-relaxed px-4"
           >
-            <span className="text-blue-300 font-semibold">Computer Science & Entrepreneurship Student</span> | 
-            <span className="text-purple-300 font-semibold"> Academic Coordinator</span> | 
-            Building innovative solutions with <span className="text-cyan-300 font-semibold">Python, Java, and C#</span>
+            <span className="text-blue-300 font-semibold">Distributed Systems</span> |
+            <span className="text-purple-300 font-semibold"> Real-time Infrastructure</span> |
+            Building reliable systems with <span className="text-cyan-300 font-semibold">Python & C++</span>
           </motion.p>
 
           {/* Social Links */}

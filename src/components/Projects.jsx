@@ -3,10 +3,32 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { ExternalLink, Github, TrendingUp, Dumbbell, GraduationCap, ShoppingCart } from "lucide-react";
+import { ExternalLink, Github, TrendingUp, Dumbbell, GraduationCap, ShoppingCart, Cpu, Lightbulb } from "lucide-react";
 
 export default function Projects() {
   const projects = [
+    {
+      title: "Hardware Simulator",
+      description: "Simulation system for testing real-time device behavior, edge cases, and failure recovery scenarios. Enables validation of system logic before production deployment without requiring physical devices.",
+      icon: <Cpu className="w-6 h-6 md:w-8 md:h-8" />,
+      image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=400&fit=crop",
+      tags: ["Python", "AsyncIO", "Redis", "Docker", "Modbus"],
+      role: "Owner & Developer",
+      status: "Active",
+      gradient: "from-cyan-500 to-blue-600",
+      github: "hardware-simulator"
+    },
+    {
+      title: "BEAM CTRL",
+      description: "Python-based system for controlling stage lighting via DMX protocol. Modular architecture supports live control, automation, concurrent effects management, and future extensibility.",
+      icon: <Lightbulb className="w-6 h-6 md:w-8 md:h-8" />,
+      image: "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=600&h=400&fit=crop",
+      tags: ["Python", "JavaScript", "DMX", "AI", "Real-time"],
+      role: "Creator",
+      status: "In Progress",
+      gradient: "from-yellow-500 to-orange-600",
+      github: "beam-ctrl"
+    },
     {
       title: "AI Stock Analyst",
       description: "An intelligent financial analysis tool that leverages artificial intelligence to provide data-driven investment recommendations based on real-time market news.",
