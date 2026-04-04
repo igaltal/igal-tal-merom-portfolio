@@ -58,7 +58,7 @@ export default function Hero() {
             <div className="relative inline-block">
               <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-lg opacity-50 animate-pulse"></div>
               <img 
-                src="/igal-tal-merom-portfolio/assets/images/igal-photo.jpg" 
+                src={`${import.meta.env.BASE_URL}assets/images/igal-photo.jpg`} 
                 alt="Igal Tal Merom"
                 className="relative w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-white/20 shadow-2xl"
                 onError={(e) => {

@@ -43,8 +43,9 @@ function PagesContent() {
 }
 
 export default function Pages() {
+    const routerBasename = import.meta.env.BASE_URL.replace(/\/$/, '') || undefined;
     return (
-        <Router>
+        <Router basename={routerBasename}>
             <PagesContent />
         </Router>
     );

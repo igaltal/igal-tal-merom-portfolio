@@ -64,7 +64,7 @@ export default function About() {
             <div className="relative mb-6 md:mb-8">
               <div className="absolute -top-2 md:-top-4 -left-2 md:-left-4 w-16 md:w-24 h-16 md:h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-50"></div>
               <img 
-                src="/igal-tal-merom-portfolio/assets/images/igal-photo.jpg" 
+                src={`${import.meta.env.BASE_URL}assets/images/igal-photo.jpg`} 
                 alt="Igal Tal Merom"
                 className="relative w-32 h-32 md:w-48 md:h-48 rounded-2xl object-cover shadow-2xl"
                 onError={(e) => {

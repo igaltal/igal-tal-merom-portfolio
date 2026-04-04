@@ -235,7 +235,7 @@ export default function Contact() {
                   className="bg-white text-blue-600 hover:bg-blue-50 border-0"
                   onClick={() => {
                     const link = document.createElement('a');
-                    link.href = '/igal-tal-merom-portfolio/assets/documents/Igal_Tal_Merom_Resume.pdf';
+                    link.href = `${import.meta.env.BASE_URL}assets/documents/Igal_Tal_Merom_Resume.pdf`;
                     link.download = 'Igal_Tal_Merom_Resume.pdf';
                     link.click();
                   }}

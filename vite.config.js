@@ -5,7 +5,8 @@ import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/igal-tal-merom-portfolio/',
+  // Custom domain on GitHub Pages is served from `/`; project-only URL needs `/igal-tal-merom-portfolio/`.
+  base: '/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
