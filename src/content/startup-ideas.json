@@ -1,0 +1,11 @@
+[
+  {
+    "title": "Example startup idea",
+    "tagline": "One-line pitch.",
+    "description": "A few sentences describing the problem, the insight, and the approach. Replace or delete this example.",
+    "stage": "concept",
+    "icon": "Lightbulb",
+    "tags": ["ai", "b2b"],
+    "link": null
+  }
+]

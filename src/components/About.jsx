@@ -2,38 +2,10 @@ import React from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { Code, Rocket, Users, Zap } from "lucide-react";
+import { profile, getIcon, asset } from "@/content";
 
 export default function About() {
-  const skills = [
-    { category: "Languages", items: ["Python", "C++", "C", "C#", "Java", "SQL"] },
-    { category: "Frameworks & Tools", items: ["React", "Flask", "Docker", "Pytest", "Git", "Linux", "Selenium", "SQLite"] },
-    { category: "Protocols & Systems", items: ["Modbus", "Redis", "TCP/IP", "RS-485"] },
-    { category: "AI & ML", items: ["OpenAI APIs", "Scikit-learn", "OpenCV", "Prompt Engineering", "Computer Vision"] }
-  ];
-
-  const highlights = [
-    {
-      icon: <Code className="w-5 h-5 md:w-6 md:h-6" />,
-      title: "Software Engineer @ Voltify",
-      description: "Designing simulation platforms and communication layers for distributed control systems"
-    },
-    {
-      icon: <Zap className="w-5 h-5 md:w-6 md:h-6" />,
-      title: "Distributed Systems",
-      description: "Real-time infrastructure, multi-threading, async systems, and production debugging"
-    },
-    {
-      icon: <Rocket className="w-5 h-5 md:w-6 md:h-6" />,
-      title: "Builder & Entrepreneur",
-      description: "CS & Entrepreneurship graduate building AI-powered and automation tools"
-    },
-    {
-      icon: <Users className="w-5 h-5 md:w-6 md:h-6" />,
-      title: "Military Background",
-      description: "Combat Soldiers Instructor in the Israeli Air Force — leadership and precision"
-    }
-  ];
+  const { about } = profile;
 
   return (
     <section id="about" className="py-16 md:py-24 bg-white">
@@ -48,7 +20,7 @@ export default function About() {
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4 md:mb-6">About Me</h2>
           <div className="w-16 md:w-20 h-1 bg-gradient-to-r from-blue-400 to-purple-400 mx-auto rounded-full mb-4 md:mb-6"></div>
           <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto px-4">
-            Passionate about creating innovative solutions that bridge technology and real-world impact
+            {about.summary}
           </p>
         </motion.div>
 
@@ -62,30 +34,24 @@ export default function About() {
             className="flex flex-col items-center lg:items-start"
           >
             <div className="relative mb-6 md:mb-8">
-              <div className="absolute -top-2 md:-top-4 -left-2 md:-left-4 w-16 md:w-24 h-16 md:h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-50"></div>
-              <img 
-                src={`${import.meta.env.BASE_URL}assets/images/igal-photo.jpg`} 
-                alt="Igal Tal Merom"
+              <div className="absolute -top-2 md:-top-4 -left-2 md:-left-4 w-16 md:w-24 h-16 md:h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full opacity-50" aria-hidden="true"></div>
+              <img
+                src={asset(profile.photo)}
+                alt={`${profile.name} portrait`}
+                width="192"
+                height="192"
+                loading="lazy"
+                decoding="async"
                 className="relative w-32 h-32 md:w-48 md:h-48 rounded-2xl object-cover shadow-2xl"
-                onError={(e) => {
-                  e.target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face";
-                }}
               />
             </div>
-            
+
             <div className="space-y-4 md:space-y-6 text-slate-700 leading-relaxed text-center lg:text-left">
-              <p className="text-base md:text-lg">
-                Software Engineer specializing in distributed systems and real-time infrastructure, with hands-on experience in Python and C++. I graduated with a B.Sc. in Computer Science & Entrepreneurship from Reichman University.
-              </p>
-              <p className="text-sm md:text-base">
-                At <span className="font-semibold text-blue-600">Voltify</span>, I'm responsible for designing and owning a simulation platform and communication layers, enabling validation of complex system behavior before production deployment. I work with Python, C++, Redis, Modbus, and Docker in a Linux environment.
-              </p>
-              <p className="text-sm md:text-base">
-                I have a strong background in <span className="font-semibold">performance optimization</span>, production debugging, multi-threaded systems, and CI/CD pipelines (Pytest, Docker, Bitbucket).
-              </p>
-              <p className="text-sm md:text-base">
-                My journey includes serving as a <span className="font-semibold">Combat Soldiers Instructor</span> in the Israeli Air Force and professional experience at the Israeli Consulate in New York, where I handled logistics for high-profile diplomatic operations.
-              </p>
+              {about.bio.map((paragraph, index) => (
+                <p key={index} className={index === 0 ? "text-base md:text-lg" : "text-sm md:text-base"}>
+                  {paragraph}
+                </p>
+              ))}
             </div>
           </motion.div>
 
@@ -101,27 +67,30 @@ export default function About() {
             <div>
               <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-4 md:mb-6 text-center lg:text-left">Key Highlights</h3>
               <div className="grid grid-cols-1 gap-4">
-                {highlights.map((highlight, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                    viewport={{ once: true }}
-                  >
-                    <Card className="p-4 md:p-6 h-full hover:shadow-lg transition-shadow duration-300">
-                      <div className="flex items-start gap-3 md:gap-4">
-                        <div className="p-2 bg-blue-100 rounded-lg text-blue-600 flex-shrink-0">
-                          {highlight.icon}
+                {about.highlights.map((highlight, index) => {
+                  const Icon = getIcon(highlight.icon);
+                  return (
+                    <motion.div
+                      key={highlight.title}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5, delay: index * 0.1 }}
+                      viewport={{ once: true }}
+                    >
+                      <Card className="p-4 md:p-6 h-full hover:shadow-lg transition-shadow duration-300">
+                        <div className="flex items-start gap-3 md:gap-4">
+                          <div className="p-2 bg-blue-100 rounded-lg text-blue-600 flex-shrink-0">
+                            <Icon className="w-5 h-5 md:w-6 md:h-6" aria-hidden="true" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-slate-900 mb-1 md:mb-2 text-sm md:text-base">{highlight.title}</h4>
+                            <p className="text-xs md:text-sm text-slate-600">{highlight.description}</p>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="font-semibold text-slate-900 mb-1 md:mb-2 text-sm md:text-base">{highlight.title}</h4>
-                          <p className="text-xs md:text-sm text-slate-600">{highlight.description}</p>
-                        </div>
-                      </div>
-                    </Card>
-                  </motion.div>
-                ))}
+                      </Card>
+                    </motion.div>
+                  );
+                })}
               </div>
             </div>
 
@@ -129,20 +98,20 @@ export default function About() {
             <div>
               <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-4 md:mb-6 text-center lg:text-left">Technical Skills</h3>
               <div className="space-y-4 md:space-y-6">
-                {skills.map((skillGroup, index) => (
+                {about.skills.map((skillGroup) => (
                   <motion.div
-                    key={index}
+                    key={skillGroup.category}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    transition={{ duration: 0.5 }}
                     viewport={{ once: true }}
                   >
                     <h4 className="font-semibold text-slate-800 mb-2 md:mb-3 text-sm md:text-base text-center lg:text-left">{skillGroup.category}</h4>
                     <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
-                      {skillGroup.items.map((skill, skillIndex) => (
-                        <Badge 
-                          key={skillIndex}
-                          variant="outline" 
+                      {skillGroup.items.map((skill) => (
+                        <Badge
+                          key={skill}
+                          variant="outline"
                           className="text-xs md:text-sm text-slate-700 border-slate-300 hover:bg-slate-50"
                         >
                           {skill}

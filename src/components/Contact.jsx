@@ -5,49 +5,68 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Send, Github, Linkedin, Download, CheckCircle } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Github, Linkedin, Download } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import emailjs from '@emailjs/browser';
+import { z } from "zod";
+import { profile, asset } from "@/content";
+
+// Shared client/server contract. Keep in sync with api/contact.js.
+const contactSchema = z.object({
+  from_name: z.string().trim().min(2, "Please enter your name").max(100),
+  from_email: z.string().trim().email("Please enter a valid email").max(200),
+  message: z.string().trim().min(10, "Message must be at least 10 characters").max(5000),
+});
 
 export default function Contact() {
-  const [formData, setFormData] = useState({
-    from_name: '',
-    from_email: '',
-    message: ''
-  });
+  const [formData, setFormData] = useState({ from_name: "", from_email: "", message: "" });
+  const [company, setCompany] = useState(""); // honeypot — must stay empty
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const parsed = contactSchema.safeParse(formData);
+    if (!parsed.success) {
+      toast({
+        title: "Please check the form",
+        description: parsed.error.issues[0]?.message || "Some fields are invalid.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
-
     try {
-      const result = await emailjs.send(
-        'YOUR_SERVICE_ID',
-        'YOUR_TEMPLATE_ID', 
-        formData,
-        'YOUR_PUBLIC_KEY'
-      );
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...parsed.data, company }),
+      });
 
-      if (result.status === 200) {
+      if (res.ok) {
         toast({
           title: "Message sent successfully!",
           description: "Thank you for reaching out. I'll get back to you soon.",
         });
-        setFormData({ from_name: '', from_email: '', message: '' });
+        setFormData({ from_name: "", from_email: "", message: "" });
+      } else if (res.status === 429) {
+        toast({
+          title: "Too many requests",
+          description: "Please wait a moment before sending another message.",
+          variant: "destructive",
+        });
+      } else {
+        throw new Error("Request failed");
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error sending message",
-        description: "Please try again or contact me directly via email.",
+        description: `Please try again or email me directly at ${profile.email}.`,
         variant: "destructive",
       });
     } finally {
@@ -56,37 +75,14 @@ export default function Contact() {
   };
 
   const contactInfo = [
-    {
-      icon: <Mail className="w-5 h-5 md:w-6 md:h-6" />,
-      label: "Email",
-      value: "igaltalmerom@gmail.com",
-      href: "mailto:igaltalmerom@gmail.com"
-    },
-    {
-      icon: <Phone className="w-5 h-5 md:w-6 md:h-6" />,
-      label: "Phone",
-      value: "+972-522-491312",
-      href: "tel:+972522491312"
-    },
-    {
-      icon: <MapPin className="w-5 h-5 md:w-6 md:h-6" />,
-      label: "Location",
-      value: "Kiryat Ono, Israel",
-      href: null
-    }
+    { icon: <Mail className="w-5 h-5 md:w-6 md:h-6" aria-hidden="true" />, label: "Email", value: profile.email, href: `mailto:${profile.email}` },
+    { icon: <Phone className="w-5 h-5 md:w-6 md:h-6" aria-hidden="true" />, label: "Phone", value: profile.phone, href: `tel:${profile.phone.replace(/[^+\d]/g, "")}` },
+    { icon: <MapPin className="w-5 h-5 md:w-6 md:h-6" aria-hidden="true" />, label: "Location", value: profile.location, href: null },
   ];
 
   const socialLinks = [
-    {
-      icon: <Linkedin className="w-5 h-5" />,
-      label: "LinkedIn",
-      href: "https://www.linkedin.com/in/igal-tal-merom-a6874a180/"
-    },
-    {
-      icon: <Github className="w-5 h-5" />,
-      label: "GitHub",
-      href: "https://github.com/igaltal"
-    }
+    { icon: <Linkedin className="w-5 h-5" aria-hidden="true" />, label: "LinkedIn", href: profile.social.linkedin },
+    { icon: <Github className="w-5 h-5" aria-hidden="true" />, label: "GitHub", href: profile.social.github },
   ];
 
   return (
@@ -119,7 +115,21 @@ export default function Contact() {
                 <CardTitle className="text-xl md:text-2xl text-white">Send a Message</CardTitle>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6" noValidate>
+                  {/* Honeypot: hidden from users, bots tend to fill it */}
+                  <div className="hidden" aria-hidden="true">
+                    <label htmlFor="company">Company (leave blank)</label>
+                    <input
+                      id="company"
+                      name="company"
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={company}
+                      onChange={(e) => setCompany(e.target.value)}
+                    />
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="from_name" className="text-slate-300">Name</Label>
                     <Input
@@ -128,6 +138,7 @@ export default function Contact() {
                       value={formData.from_name}
                       onChange={handleChange}
                       required
+                      autoComplete="name"
                       className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
                       placeholder="Your full name"
                     />
@@ -141,6 +152,7 @@ export default function Contact() {
                       value={formData.from_email}
                       onChange={handleChange}
                       required
+                      autoComplete="email"
                       className="bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400"
                       placeholder="your.email@example.com"
                     />
@@ -158,19 +170,19 @@ export default function Contact() {
                       placeholder="Tell me about your project or just say hello..."
                     />
                   </div>
-                  <Button 
+                  <Button
                     type="submit"
                     disabled={isLoading}
                     className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 border-0"
                   >
                     {isLoading ? (
                       <>
-                        <div className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        <div className="w-4 h-4 mr-2 border-2 border-white/30 border-t-white rounded-full animate-spin" aria-hidden="true"></div>
                         Sending...
                       </>
                     ) : (
                       <>
-                        <Send className="w-4 h-4 mr-2" />
+                        <Send className="w-4 h-4 mr-2" aria-hidden="true" />
                         Send Message
                       </>
                     )}
@@ -196,7 +208,7 @@ export default function Contact() {
               <CardContent className="space-y-4 md:space-y-6">
                 {contactInfo.map((item, index) => (
                   <motion.div
-                    key={index}
+                    key={item.label}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -209,10 +221,7 @@ export default function Contact() {
                     <div>
                       <p className="text-xs md:text-sm text-slate-400 font-medium">{item.label}</p>
                       {item.href ? (
-                        <a 
-                          href={item.href}
-                          className="text-sm md:text-base text-white hover:text-blue-400 transition-colors"
-                        >
+                        <a href={item.href} className="text-sm md:text-base text-white hover:text-blue-400 transition-colors">
                           {item.value}
                         </a>
                       ) : (
@@ -221,6 +230,21 @@ export default function Contact() {
                     </div>
                   </motion.div>
                 ))}
+
+                <div className="flex gap-3 pt-2">
+                  {socialLinks.map((s) => (
+                    <a
+                      key={s.label}
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={s.label}
+                      className="p-3 bg-slate-700/50 rounded-lg text-white hover:bg-blue-600 transition-colors"
+                    >
+                      {s.icon}
+                    </a>
+                  ))}
+                </div>
               </CardContent>
             </Card>
 
@@ -231,17 +255,11 @@ export default function Contact() {
                 <p className="text-blue-100 mb-4 md:mb-6 text-sm md:text-base">
                   Get a detailed overview of my experience, skills, and projects
                 </p>
-                <Button 
-                  className="bg-white text-blue-600 hover:bg-blue-50 border-0"
-                  onClick={() => {
-                    const link = document.createElement('a');
-                    link.href = `${import.meta.env.BASE_URL}assets/documents/Igal_Tal_Merom_Resume.pdf`;
-                    link.download = 'Igal_Tal_Merom_Resume.pdf';
-                    link.click();
-                  }}
-                >
-                  <Download className="w-4 h-4 mr-2" />
-                  Download Resume
+                <Button asChild className="bg-white text-blue-600 hover:bg-blue-50 border-0">
+                  <a href={asset(profile.resumeFile)} download>
+                    <Download className="w-4 h-4 mr-2" aria-hidden="true" />
+                    Download Resume
+                  </a>
                 </Button>
               </CardContent>
             </Card>

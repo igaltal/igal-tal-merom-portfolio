@@ -1,0 +1,10 @@
+[
+  {
+    "title": "Example talk or demo",
+    "description": "Short description of what this video covers. Replace or delete this example.",
+    "url": "https://www.youtube.com/watch?v=REPLACE_ME",
+    "thumbnail": "assets/images/videos/example.jpg",
+    "date": "2025-01-01",
+    "tags": ["talk", "demo"]
+  }
+]

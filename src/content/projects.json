@@ -1,0 +1,79 @@
+[
+  {
+    "title": "Relay",
+    "description": "Ship from anywhere. Point an AI agent at your repo — it reads your code, writes the fix, and runs the tests. Browser-based agent chat with full repo context, built-in skills, and GitHub integration. No install required.",
+    "icon": "Sparkles",
+    "image": "https://relay-code.com/apple-icon.png",
+    "tags": ["Next.js", "TypeScript", "AI Agents", "GitHub", "React"],
+    "role": "Founder & Developer",
+    "status": "Live (Beta)",
+    "gradient": "from-violet-500 to-indigo-600",
+    "url": "https://relay-code.com"
+  },
+  {
+    "title": "Hardware Simulator",
+    "description": "Simulation system for testing real-time device behavior, edge cases, and failure recovery scenarios. Enables validation of system logic before production deployment without requiring physical devices.",
+    "icon": "Cpu",
+    "image": "assets/images/projects/hardware-simulator.jpg",
+    "tags": ["Python", "AsyncIO", "Redis", "Docker", "Modbus"],
+    "role": "Owner & Developer",
+    "status": "Active",
+    "gradient": "from-cyan-500 to-blue-600",
+    "github": "hardware-simulator"
+  },
+  {
+    "title": "BEAM CTRL",
+    "description": "Real-time DMX lighting control from any browser — live sliders, mobile show mode, and cue playback for stage lighting. Free desktop app for USB DMX on Mac or PC. AI-powered scene generation and music analysis.",
+    "icon": "Lightbulb",
+    "image": "assets/images/projects/beam-ctrl.jpg",
+    "tags": ["Python", "JavaScript", "DMX", "WebSocket", "Real-time"],
+    "role": "Creator",
+    "status": "Live (Beta)",
+    "gradient": "from-yellow-500 to-orange-600",
+    "url": "https://beam-ctrl.com"
+  },
+  {
+    "title": "AI Stock Analyst",
+    "description": "An intelligent financial analysis tool that leverages artificial intelligence to provide data-driven investment recommendations based on real-time market news.",
+    "icon": "TrendingUp",
+    "image": "assets/images/projects/ai-stock-analyst.jpg",
+    "tags": ["Python", "AI/ML", "Financial Analysis", "Real-time Data"],
+    "role": "Full-Stack Developer",
+    "status": "Active Development",
+    "gradient": "from-green-500 to-emerald-600",
+    "github": "ai-stock-analyst"
+  },
+  {
+    "title": "My Personal Gym",
+    "description": "A comprehensive web application designed to manage and enhance the experience of gym goers and trainers. Includes user management, trainer schedules, and progress tracking.",
+    "icon": "Dumbbell",
+    "image": "assets/images/projects/my-personal-gym.jpg",
+    "tags": ["C#", "SQLite", "Web Development", "Database Management"],
+    "role": "Lead Developer",
+    "status": "Completed",
+    "gradient": "from-blue-500 to-cyan-600",
+    "github": "My_Personal_Gym"
+  },
+  {
+    "title": "University Grades Project",
+    "description": "Automated system for retrieving and notifying university grades using Selenium for web scraping, SQLite for database management, and Telegram bot for notifications.",
+    "icon": "GraduationCap",
+    "image": "assets/images/projects/university-grades.jpg",
+    "tags": ["Python", "Selenium", "SQLite", "Telegram Bot"],
+    "role": "Solo Developer",
+    "status": "Live",
+    "gradient": "from-purple-500 to-indigo-600",
+    "github": "UniversityGradesProject"
+  },
+  {
+    "title": "AliPrice Optimizer",
+    "description": "A tool that optimizes the shopping experience by focusing on price efficiency, helping users find the best deals across different platforms.",
+    "icon": "ShoppingCart",
+    "image": "assets/images/projects/aliprice-optimizer.jpg",
+    "tags": ["Python", "Web Scraping", "Price Comparison", "Automation"],
+    "role": "Creator",
+    "status": "In Progress",
+    "gradient": "from-orange-500 to-red-600",
+    "github": "AliPriceOptimizer"
+  }
+]

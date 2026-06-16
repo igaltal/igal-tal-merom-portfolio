@@ -2,23 +2,35 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowDown, Github, Linkedin, Mail, Code, Rocket, Star } from "lucide-react";
 import { motion } from "framer-motion";
+import { profile, asset } from "@/content";
+
+const ACCENTS = {
+  blue: "text-blue-300 font-semibold",
+  purple: "text-purple-300 font-semibold",
+  cyan: "text-cyan-300 font-semibold",
+  none: "",
+};
+
+const openExternal = (url) => window.open(url, "_blank", "noopener,noreferrer");
 
 export default function Hero() {
   const scrollToSection = (sectionId) => {
-    document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const { hero, social } = profile;
+
   return (
-    <section className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 relative overflow-hidden">
+    <section className="min-h-screen flex items-center justify-center pt-20 md:pt-24 pb-12 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800 relative overflow-hidden">
       {/* Animated Background Elements */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0" aria-hidden="true">
         <div className="absolute top-10 md:top-20 left-10 md:left-20 w-48 md:w-96 h-48 md:h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-10 md:bottom-20 right-10 md:right-20 w-40 md:w-80 h-40 md:h-80 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32 md:w-64 h-32 md:h-64 bg-cyan-500/10 rounded-full blur-2xl animate-pulse delay-500"></div>
       </div>
-      
+
       {/* Floating Icons - Hidden on mobile */}
-      <div className="absolute inset-0 overflow-hidden hidden md:block">
+      <div className="absolute inset-0 overflow-hidden hidden md:block" aria-hidden="true">
         <motion.div
           animate={{ y: [0, -20, 0], rotate: [0, 5, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -41,7 +53,7 @@ export default function Hero() {
           <Star className="w-7 h-7" />
         </motion.div>
       </div>
-      
+
       <div className="container mx-auto px-4 md:px-6 text-center relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -56,29 +68,29 @@ export default function Hero() {
             className="mb-6 md:mb-8"
           >
             <div className="relative inline-block">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-lg opacity-50 animate-pulse"></div>
-              <img 
-                src={`${import.meta.env.BASE_URL}assets/images/igal-photo.jpg`} 
-                alt="Igal Tal Merom"
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full blur-lg opacity-50 animate-pulse" aria-hidden="true"></div>
+              <img
+                src={asset(profile.photo)}
+                alt={`Portrait of ${profile.name}`}
+                width="160"
+                height="160"
+                fetchpriority="high"
+                decoding="async"
                 className="relative w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-white/20 shadow-2xl"
-                onError={(e) => {
-                  // Fallback to a placeholder if the image doesn't exist
-                  e.target.src = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face";
-                }}
               />
             </div>
           </motion.div>
 
           {/* Name */}
-          <motion.h1 
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
             className="text-3xl md:text-5xl lg:text-7xl font-bold text-white mb-4 md:mb-6 tracking-tight px-2"
           >
-            Igal Tal Merom
+            {profile.name}
           </motion.h1>
-          
+
           {/* Tagline */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -87,12 +99,13 @@ export default function Hero() {
             className="mb-6 md:mb-8 px-2"
           >
             <div className="inline-flex items-center gap-2 md:gap-3 bg-white/10 backdrop-blur-xl rounded-full px-4 md:px-8 py-2 md:py-4 shadow-2xl border border-white/20">
-              <motion.span 
+              <motion.span
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
                 className="w-2 md:w-3 h-2 md:h-3 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full flex-shrink-0"
+                aria-hidden="true"
               />
-              <span className="text-sm md:text-xl text-white font-medium">Software Engineer @ Voltify</span>
+              <span className="text-sm md:text-xl text-white font-medium">{hero.tagline}</span>
             </div>
           </motion.div>
 
@@ -103,9 +116,12 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.5 }}
             className="text-lg md:text-xl lg:text-2xl text-slate-300 mb-8 md:mb-12 max-w-4xl mx-auto leading-relaxed px-4"
           >
-            <span className="text-blue-300 font-semibold">Distributed Systems</span> |
-            <span className="text-purple-300 font-semibold"> Real-time Infrastructure</span> |
-            Building reliable systems with <span className="text-cyan-300 font-semibold">Python & C++</span>
+            {hero.headlineParts.map((part, i) => (
+              <React.Fragment key={part.text}>
+                {i > 0 && " | "}
+                <span className={ACCENTS[part.accent] || ""}>{part.text}</span>
+              </React.Fragment>
+            ))}
           </motion.p>
 
           {/* Social Links */}
@@ -115,41 +131,42 @@ export default function Hero() {
             transition={{ duration: 0.8, delay: 0.6 }}
             className="flex flex-col sm:flex-row justify-center gap-3 md:gap-6 mb-12 md:mb-16 px-4"
           >
-            <Button 
-              variant="outline" 
-              size="lg" 
+            <Button
+              variant="outline"
+              size="lg"
               className="w-full sm:w-auto bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 hover:border-white/30 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
-              onClick={() => window.open('https://github.com/igaltal', '_blank')}
+              onClick={() => openExternal(social.github)}
             >
-              <Github className="w-4 md:w-5 h-4 md:h-5 mr-2" />
+              <Github className="w-4 md:w-5 h-4 md:h-5 mr-2" aria-hidden="true" />
               GitHub
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="lg"
               className="w-full sm:w-auto bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 hover:border-white/30 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
-              onClick={() => window.open('https://www.linkedin.com/in/igal-tal-merom-a6874a180/', '_blank')}
+              onClick={() => openExternal(social.linkedin)}
             >
-              <Linkedin className="w-4 md:w-5 h-4 md:h-5 mr-2" />
+              <Linkedin className="w-4 md:w-5 h-4 md:h-5 mr-2" aria-hidden="true" />
               LinkedIn
             </Button>
-            <Button 
+            <Button
               size="lg"
               className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-0 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300"
-              onClick={() => scrollToSection('contact')}
+              onClick={() => scrollToSection("contact")}
             >
-              <Mail className="w-4 md:w-5 h-4 md:h-5 mr-2" />
+              <Mail className="w-4 md:w-5 h-4 md:h-5 mr-2" aria-hidden="true" />
               Get In Touch
             </Button>
           </motion.div>
 
           {/* Scroll Indicator */}
-          <motion.div
+          <motion.button
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 1 }}
-            className="cursor-pointer"
-            onClick={() => scrollToSection('about')}
+            className="cursor-pointer mx-auto"
+            onClick={() => scrollToSection("about")}
+            aria-label="Scroll to About section"
           >
             <motion.div
               animate={{ y: [0, 10, 0] }}
@@ -158,15 +175,15 @@ export default function Hero() {
             >
               <span className="text-xs md:text-sm font-medium mb-2">Discover More</span>
               <div className="p-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
-                <ArrowDown className="w-4 md:w-5 h-4 md:h-5" />
+                <ArrowDown className="w-4 md:w-5 h-4 md:h-5" aria-hidden="true" />
               </div>
             </motion.div>
-          </motion.div>
+          </motion.button>
         </motion.div>
       </div>
 
       {/* Bottom Gradient Overlay */}
-      <div className="absolute bottom-0 left-0 right-0 h-20 md:h-32 bg-gradient-to-t from-white to-transparent"></div>
+      <div className="absolute bottom-0 left-0 right-0 h-20 md:h-32 bg-gradient-to-t from-white to-transparent" aria-hidden="true"></div>
     </section>
   );
 }

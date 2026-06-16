@@ -1,0 +1,10 @@
+[
+  {
+    "title": "Example presentation",
+    "description": "Short description of this deck. Replace or delete this example.",
+    "url": "https://docs.google.com/presentation/d/REPLACE_ME",
+    "thumbnail": "assets/images/presentations/example.jpg",
+    "date": "2025-01-01",
+    "tags": ["pitch"]
+  }
+]
