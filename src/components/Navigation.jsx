@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, CalendarClock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Navigation() {
@@ -24,6 +24,12 @@ export default function Navigation() {
   }, []);
 
   const scrollToSection = (sectionId) => {
+    // These sections only exist on the home page - navigate there first if
+    // we're elsewhere (e.g. /booking).
+    if (window.location.pathname !== '/') {
+      window.location.href = '/' + sectionId;
+      return;
+    }
     const element = document.querySelector(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -71,11 +77,22 @@ export default function Navigation() {
                   {item.label}
                 </motion.button>
               ))}
-              <Button 
+              <a
+                href="/booking"
+                className={`flex items-center gap-1.5 font-medium transition-colors duration-200 ${
+                  isScrolled
+                    ? 'text-slate-700 hover:text-blue-600'
+                    : 'text-white/90 hover:text-white'
+                }`}
+              >
+                <CalendarClock className="w-4 h-4" />
+                Book a Meeting
+              </a>
+              <Button
                 onClick={() => scrollToSection('#contact')}
                 className={`${
-                  isScrolled 
-                    ? 'bg-blue-600 hover:bg-blue-700' 
+                  isScrolled
+                    ? 'bg-blue-600 hover:bg-blue-700'
                     : 'bg-white/20 backdrop-blur-sm hover:bg-white/30'
                 } border-0`}
               >
@@ -119,7 +136,14 @@ export default function Navigation() {
                     {item.label}
                   </motion.button>
                 ))}
-                <Button 
+                <a
+                  href="/booking"
+                  className="flex items-center gap-1.5 text-left text-slate-700 hover:text-blue-600 font-medium py-2 transition-colors duration-200"
+                >
+                  <CalendarClock className="w-4 h-4" />
+                  Book a Meeting
+                </a>
+                <Button
                   onClick={() => scrollToSection('#contact')}
                   className="w-full bg-blue-600 hover:bg-blue-700 mt-4"
                 >

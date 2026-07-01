@@ -10,11 +10,35 @@ const Projects = lazy(() => import("./components/Projects"));
 const Contact = lazy(() => import("./components/Contact"));
 const Footer = lazy(() => import("./components/Footer"));
 const Toaster = lazy(() => import("./components/ui/toaster").then((m) => ({ default: m.Toaster })));
+// This is a single-page site with no client router; /booking is the one
+// other route, so a plain pathname check is simpler than pulling in one.
+const Booking = lazy(() => import("./pages/Booking"));
 
 const description =
   "Igal Tal Merom — Software Engineer building distributed systems and real-time infrastructure with Python & C++. CS & Entrepreneurship graduate, builder, and founder.";
 
 function App() {
+  const isBooking = window.location.pathname.replace(/\/$/, '') === '/booking';
+
+  if (isBooking) {
+    return (
+      <>
+        <div className="min-h-screen">
+          <Navigation />
+          <Suspense fallback={<div className="min-h-screen" aria-hidden="true" />}>
+            <Booking />
+          </Suspense>
+          <Suspense fallback={null}>
+            <Footer />
+          </Suspense>
+        </div>
+        <Suspense fallback={null}>
+          <Toaster />
+        </Suspense>
+      </>
+    );
+  }
+
   return (
     <>
       <Seo
