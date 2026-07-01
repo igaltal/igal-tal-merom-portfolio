@@ -6,10 +6,25 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Seo from "@/components/Seo";
 import { motion } from "framer-motion";
-import { CalendarClock, ChevronLeft, ChevronRight, Clock, CheckCircle2, Loader2 } from "lucide-react";
+import {
+  CalendarClock,
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle2,
+  Loader2,
+  Lock,
+  Unlock,
+} from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
-const WEEKDAY_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const ADMIN_TOKEN_STORAGE_KEY = "bookingAdminToken";
+
+const DURATIONS = [
+  { label: "15m", value: 15 },
+  { label: "30m", value: 30 },
+  { label: "1h", value: 60 },
+  { label: "2h", value: 120 },
+];
 
 // Fallback working-hours used only until /api/availability responds, so the
 // calendar isn't empty on first paint. The backend's own config (api/_lib/
@@ -18,9 +33,10 @@ const DEFAULT_WORKING_HOURS = {
   days: [0, 1, 2, 3, 4],
   startHour: 9,
   endHour: 18,
-  slotMinutes: 30,
+  slotMinutes: 15,
   timeZone: "Asia/Jerusalem",
 };
+const DEFAULT_MIN_NOTICE_HOURS = 12;
 
 function startOfDay(date) {
   const d = new Date(date);
@@ -38,14 +54,10 @@ function startOfWeek(date) {
   return d;
 }
 
-function buildMonthCells(year, month) {
-  const firstDay = new Date(year, month, 1);
-  const daysInMonth = new Date(year, month + 1, 0).getDate();
-  const cells = [];
-  for (let i = 0; i < firstDay.getDay(); i++) cells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d));
-  while (cells.length % 7 !== 0) cells.push(null);
-  return cells;
+function dateKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
+    date.getDate()
+  ).padStart(2, "0")}`;
 }
 
 function buildWeekDays(weekStart) {
@@ -56,16 +68,18 @@ function buildWeekDays(weekStart) {
   });
 }
 
-function buildSlotsForDay(day, workingHours, busy) {
-  const { startHour, endHour, slotMinutes } = workingHours;
+function buildSlotsForDay(day, workingHours, busy, duration, minNoticeHours) {
+  const step = workingHours.slotMinutes || 15;
+  const { startHour, endHour } = workingHours;
   const slots = [];
   const dayStart = startOfDay(day);
+  const earliestStart = new Date(Date.now() + minNoticeHours * 3600000);
 
-  for (let minutes = startHour * 60; minutes < endHour * 60; minutes += slotMinutes) {
+  for (let minutes = startHour * 60; minutes + duration <= endHour * 60; minutes += step) {
     const slotStart = new Date(dayStart.getTime() + minutes * 60000);
-    const slotEnd = new Date(slotStart.getTime() + slotMinutes * 60000);
+    const slotEnd = new Date(slotStart.getTime() + duration * 60000);
 
-    if (slotStart < new Date()) continue;
+    if (slotStart < earliestStart) continue;
 
     const isBusy = busy.some((b) => {
       const bStart = new Date(b.start);
@@ -87,13 +101,15 @@ function formatDay(date) {
   return date.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 }
 
-function RequestForm({ selectedDay, selectedSlot, onChooseDifferentTime, form, setForm, isSubmitting, onSubmit }) {
+function RequestForm({ selectedSlot, onChooseDifferentTime, form, setForm, isSubmitting, onSubmit }) {
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       <div>
         <p className="text-sm text-slate-500">You&apos;re requesting</p>
         <p className="font-semibold text-slate-900">
-          {formatDay(selectedDay)} {" · "} {formatTime(selectedSlot.start)}
+          {formatDay(selectedSlot.start)} {" · "} {formatTime(selectedSlot.start)}
+          {"–"}
+          {formatTime(selectedSlot.end)}
         </p>
         <button
           type="button"
@@ -148,26 +164,45 @@ function RequestForm({ selectedDay, selectedSlot, onChooseDifferentTime, form, s
 export default function Booking() {
   const { toast } = useToast();
   const today = useMemo(() => new Date(), []);
-  const [view, setView] = useState("week");
-  const [month, setMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
-  const [weekStart, setWeekStart] = useState(() => startOfWeek(today));
-  const [selectedDay, setSelectedDay] = useState(null);
+  const [focusDay, setFocusDay] = useState(() => startOfDay(today));
+  const [duration, setDuration] = useState(30);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [busy, setBusy] = useState([]);
   const [workingHours, setWorkingHours] = useState(DEFAULT_WORKING_HOURS);
+  const [minNoticeHours, setMinNoticeHours] = useState(DEFAULT_MIN_NOTICE_HOURS);
   const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", message: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
+  const [adminToken, setAdminToken] = useState(null);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [adminTokenInput, setAdminTokenInput] = useState("");
+  const [adminError, setAdminError] = useState(null);
+  const [blockedDays, setBlockedDays] = useState(new Set());
+
+  const weekStart = useMemo(() => startOfWeek(focusDay), [focusDay]);
+  const weekDays = useMemo(() => buildWeekDays(weekStart), [weekStart]);
+
+  // Owner sign-in: accept ?admin=TOKEN once, then remember it locally and
+  // scrub it from the visible URL. Otherwise pick up a previously saved token.
   useEffect(() => {
-    const rangeStart =
-      view === "week" ? weekStart : startOfDay(new Date(month.getFullYear(), month.getMonth(), 1));
-    const rangeEnd =
-      view === "week"
-        ? new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 7)
-        : new Date(month.getFullYear(), month.getMonth() + 1, 1);
+    const params = new URLSearchParams(window.location.search);
+    const urlToken = params.get("admin");
+    if (urlToken) {
+      localStorage.setItem(ADMIN_TOKEN_STORAGE_KEY, urlToken);
+      window.history.replaceState(null, "", window.location.pathname);
+      setAdminToken(urlToken);
+    } else {
+      const stored = localStorage.getItem(ADMIN_TOKEN_STORAGE_KEY);
+      if (stored) setAdminToken(stored);
+    }
+  }, []);
+
+  useEffect(() => {
+    const rangeStart = weekStart;
+    const rangeEnd = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 7);
 
     setIsLoadingAvailability(true);
     setLoadError(false);
@@ -184,70 +219,104 @@ export default function Booking() {
       .then((data) => {
         setBusy(data.busy || []);
         if (data.workingHours) setWorkingHours(data.workingHours);
+        if (typeof data.minNoticeHours === "number") setMinNoticeHours(data.minNoticeHours);
       })
       .catch(() => setLoadError(true))
       .finally(() => setIsLoadingAvailability(false));
-  }, [view, month, weekStart]);
+  }, [weekStart]);
 
-  const monthCells = useMemo(
-    () => buildMonthCells(month.getFullYear(), month.getMonth()),
-    [month]
-  );
-
-  const weekDays = useMemo(() => buildWeekDays(weekStart), [weekStart]);
-
-  const timeRows = useMemo(() => {
-    const rows = [];
-    for (let m = workingHours.startHour * 60; m < workingHours.endHour * 60; m += workingHours.slotMinutes) {
-      rows.push(m);
+  useEffect(() => {
+    if (!adminToken) {
+      setBlockedDays(new Set());
+      return;
     }
-    return rows;
-  }, [workingHours]);
+    const rangeStart = weekStart;
+    const rangeEnd = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + 7);
 
-  const daySlots = useMemo(() => {
-    if (!selectedDay) return [];
-    return buildSlotsForDay(selectedDay, workingHours, busy);
-  }, [selectedDay, workingHours, busy]);
+    fetch(
+      `/api/blocked-days?start=${encodeURIComponent(rangeStart.toISOString())}&end=${encodeURIComponent(
+        rangeEnd.toISOString()
+      )}`,
+      { headers: { "x-admin-token": adminToken } }
+    )
+      .then((res) => {
+        if (res.status === 401) throw new Error("unauthorized");
+        if (!res.ok) throw new Error("failed");
+        return res.json();
+      })
+      .then((data) => setBlockedDays(new Set(data.blockedDays || [])))
+      .catch((err) => {
+        if (err.message === "unauthorized") {
+          setAdminError("That owner token was rejected.");
+          setAdminToken(null);
+          localStorage.removeItem(ADMIN_TOKEN_STORAGE_KEY);
+        }
+      });
+  }, [adminToken, weekStart]);
 
-  const weekFreeSlotsByDay = useMemo(
-    () =>
-      weekDays.map((day) => {
-        const isOff = startOfDay(day) < startOfDay(today) || !workingHours.days.includes(day.getDay());
-        const freeStarts = isOff ? new Set() : new Set(buildSlotsForDay(day, workingHours, busy).map((s) => s.start.getTime()));
-        return { day, isOff, freeStarts };
-      }),
-    [weekDays, workingHours, busy, today]
-  );
-
-  const isDayDisabled = (day) => {
-    if (startOfDay(day) < startOfDay(today)) return true;
-    if (!workingHours.days.includes(day.getDay())) return true;
-    return buildSlotsForDay(day, workingHours, busy).length === 0;
-  };
-
-  const handleSelectDay = (day) => {
-    if (isDayDisabled(day)) return;
-    setSelectedDay(day);
-    setSelectedSlot(null);
-  };
-
-  const changeMonth = (delta) => {
-    setMonth(new Date(month.getFullYear(), month.getMonth() + delta, 1));
-    setSelectedDay(null);
-    setSelectedSlot(null);
-  };
+  const slotsByDay = useMemo(() => {
+    const map = new Map();
+    for (const day of weekDays) {
+      map.set(dateKey(day), buildSlotsForDay(day, workingHours, busy, duration, minNoticeHours));
+    }
+    return map;
+  }, [weekDays, workingHours, busy, duration, minNoticeHours]);
 
   const changeWeek = (delta) => {
-    setWeekStart(new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + delta * 7));
-    setSelectedDay(null);
+    setFocusDay(new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate() + delta * 7));
     setSelectedSlot(null);
   };
 
-  const handleSelectWeekSlot = (day, minutes) => {
-    const start = new Date(startOfDay(day).getTime() + minutes * 60000);
-    const end = new Date(start.getTime() + workingHours.slotMinutes * 60000);
-    setSelectedDay(day);
-    setSelectedSlot({ start, end });
+  const changeDay = (delta) => {
+    setFocusDay(new Date(focusDay.getFullYear(), focusDay.getMonth(), focusDay.getDate() + delta));
+    setSelectedSlot(null);
+  };
+
+  const jumpToDate = (value) => {
+    if (!value) return;
+    setFocusDay(startOfDay(new Date(`${value}T00:00:00`)));
+    setSelectedSlot(null);
+  };
+
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    const token = adminTokenInput.trim();
+    if (!token) return;
+    setAdminError(null);
+    setAdminToken(token);
+    localStorage.setItem(ADMIN_TOKEN_STORAGE_KEY, token);
+    setShowAdminLogin(false);
+    setAdminTokenInput("");
+  };
+
+  const handleAdminLogout = () => {
+    setAdminToken(null);
+    localStorage.removeItem(ADMIN_TOKEN_STORAGE_KEY);
+    setBlockedDays(new Set());
+  };
+
+  const handleToggleBlock = async (day) => {
+    const key = dateKey(day);
+    const action = blockedDays.has(key) ? "unblock" : "block";
+
+    try {
+      const res = await fetch("/api/block-day", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-token": adminToken },
+        body: JSON.stringify({ date: key, action }),
+      });
+      if (!res.ok) throw new Error();
+
+      setBlockedDays((prev) => {
+        const next = new Set(prev);
+        if (action === "block") next.add(key);
+        else next.delete(key);
+        return next;
+      });
+      setFocusDay(new Date(focusDay));
+    } catch {
+      toast({ title: "Could not update that day", variant: "destructive" });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -278,8 +347,7 @@ export default function Booking() {
         });
         if (res.status === 409) {
           setSelectedSlot(null);
-          setWeekStart(new Date(weekStart));
-          setMonth(new Date(month));
+          setFocusDay(new Date(focusDay));
         }
         return;
       }
@@ -296,6 +364,12 @@ export default function Booking() {
     }
   };
 
+  const isAdmin = Boolean(adminToken);
+  const focusDayKey = dateKey(focusDay);
+  const focusDaySlots = slotsByDay.get(focusDayKey) || [];
+  const focusDayBlocked = blockedDays.has(focusDayKey);
+  const focusDayOff = !workingHours.days.includes(focusDay.getDay());
+
   return (
     <>
       <Seo
@@ -308,7 +382,7 @@ export default function Booking() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-10"
+            className="text-center mb-8"
           >
             <div className="inline-flex items-center gap-2 text-blue-600 font-medium mb-3">
               <CalendarClock className="w-5 h-5" />
@@ -318,7 +392,7 @@ export default function Booking() {
               Find a time that works for both of us
             </h1>
             <p className="text-slate-600 max-w-xl mx-auto">
-              Pick an open slot below and send a request. You&apos;ll only ever see whether
+              Pick how long you need and an open slot below. You&apos;ll only ever see whether
               I&apos;m free or busy — no calendar details are shared. I&apos;ll confirm by email
               once I approve the request.
             </p>
@@ -343,47 +417,142 @@ export default function Booking() {
           ) : (
             <>
               <div className="flex justify-center gap-2 mb-6">
-                <Button
-                  variant={view === "week" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setView("week")}
-                >
-                  Week
-                </Button>
-                <Button
-                  variant={view === "month" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setView("month")}
-                >
-                  Month
-                </Button>
+                {DURATIONS.map((d) => (
+                  <Button
+                    key={d.value}
+                    variant={duration === d.value ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      setDuration(d.value);
+                      setSelectedSlot(null);
+                    }}
+                  >
+                    {d.label}
+                  </Button>
+                ))}
               </div>
 
-              {view === "week" ? (
-                <div className="space-y-6">
-                  <Card className="p-4 md:p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <Button variant="ghost" size="icon" onClick={() => changeWeek(-1)} aria-label="Previous week">
-                        <ChevronLeft className="w-4 h-4" />
-                      </Button>
+              {/* Mobile: single-day agenda */}
+              <div className="md:hidden space-y-4">
+                <Card className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <Button variant="ghost" size="icon" onClick={() => changeDay(-1)} aria-label="Previous day">
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+                    <div className="font-medium text-slate-900 text-center">{formatDay(focusDay)}</div>
+                    <Button variant="ghost" size="icon" onClick={() => changeDay(1)} aria-label="Next day">
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
+
+                  <div className="flex justify-center mb-4">
+                    <input
+                      type="date"
+                      value={focusDayKey}
+                      min={dateKey(today)}
+                      onChange={(e) => jumpToDate(e.target.value)}
+                      className="text-sm border border-input rounded-md px-2 py-1 bg-background"
+                    />
+                  </div>
+
+                  {isAdmin && (
+                    <Button
+                      variant={focusDayBlocked ? "destructive" : "outline"}
+                      size="sm"
+                      className="w-full mb-4"
+                      onClick={() => handleToggleBlock(focusDay)}
+                    >
+                      {focusDayBlocked ? (
+                        <>
+                          <Unlock className="w-3.5 h-3.5 mr-1.5" /> Unblock this day
+                        </>
+                      ) : (
+                        <>
+                          <Lock className="w-3.5 h-3.5 mr-1.5" /> Block this day
+                        </>
+                      )}
+                    </Button>
+                  )}
+
+                  {focusDayOff || focusDayBlocked ? (
+                    <p className="text-sm text-slate-500 text-center py-8">
+                      {focusDayBlocked ? "This day is blocked." : "Not available on this day."}
+                    </p>
+                  ) : focusDaySlots.length === 0 ? (
+                    <p className="text-sm text-slate-500 text-center py-8">No open slots this day.</p>
+                  ) : (
+                    <div className="grid grid-cols-3 gap-2">
+                      {focusDaySlots.map((slot) => (
+                        <Button
+                          key={slot.start.toISOString()}
+                          variant="outline"
+                          onClick={() => setSelectedSlot(slot)}
+                        >
+                          {formatTime(slot.start)}
+                        </Button>
+                      ))}
+                    </div>
+                  )}
+
+                  {isLoadingAvailability && (
+                    <div className="flex items-center justify-center gap-2 text-sm text-slate-500 mt-3">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Checking availability...
+                    </div>
+                  )}
+                </Card>
+
+                {selectedSlot && (
+                  <Card className="p-4">
+                    <RequestForm
+                      selectedSlot={selectedSlot}
+                      onChooseDifferentTime={() => setSelectedSlot(null)}
+                      form={form}
+                      setForm={setForm}
+                      isSubmitting={isSubmitting}
+                      onSubmit={handleSubmit}
+                    />
+                  </Card>
+                )}
+              </div>
+
+              {/* Desktop: full week grid */}
+              <div className="hidden md:block space-y-6">
+                <Card className="p-4 md:p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <Button variant="ghost" size="icon" onClick={() => changeWeek(-1)} aria-label="Previous week">
+                      <ChevronLeft className="w-4 h-4" />
+                    </Button>
+                    <div className="flex items-center gap-3">
                       <span className="font-medium text-slate-900">
                         {weekDays[0].toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                         {" – "}
                         {weekDays[6].toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                       </span>
-                      <Button variant="ghost" size="icon" onClick={() => changeWeek(1)} aria-label="Next week">
-                        <ChevronRight className="w-4 h-4" />
-                      </Button>
+                      <input
+                        type="date"
+                        value={focusDayKey}
+                        min={dateKey(today)}
+                        onChange={(e) => jumpToDate(e.target.value)}
+                        className="text-xs border border-input rounded-md px-1.5 py-1 bg-background"
+                      />
                     </div>
+                    <Button variant="ghost" size="icon" onClick={() => changeWeek(1)} aria-label="Next week">
+                      <ChevronRight className="w-4 h-4" />
+                    </Button>
+                  </div>
 
-                    <div className="overflow-x-auto">
-                      <div
-                        className="grid gap-px bg-slate-200 border border-slate-200 rounded-md overflow-hidden min-w-[640px]"
-                        style={{ gridTemplateColumns: "56px repeat(7, 1fr)" }}
-                      >
-                        <div className="bg-white" />
-                        {weekDays.map((day) => (
-                          <div key={day.toISOString()} className="bg-white text-center py-2">
+                  <div className="overflow-x-auto">
+                    <div
+                      className="grid gap-px bg-slate-200 border border-slate-200 rounded-md overflow-hidden min-w-[640px]"
+                      style={{ gridTemplateColumns: "56px repeat(7, 1fr)" }}
+                    >
+                      <div className="bg-white" />
+                      {weekDays.map((day) => {
+                        const key = dateKey(day);
+                        const blocked = blockedDays.has(key);
+                        return (
+                          <div key={key} className="bg-white text-center py-2">
                             <div className="text-xs text-muted-foreground">
                               {day.toLocaleDateString("en-US", { weekday: "short" })}
                             </div>
@@ -394,10 +563,29 @@ export default function Booking() {
                             >
                               {day.getDate()}
                             </div>
+                            {isAdmin && (
+                              <button
+                                type="button"
+                                onClick={() => handleToggleBlock(day)}
+                                title={blocked ? "Unblock this day" : "Block this day"}
+                                className={`mt-1 inline-flex items-center justify-center w-5 h-5 rounded ${
+                                  blocked ? "text-red-600" : "text-slate-300 hover:text-slate-500"
+                                }`}
+                              >
+                                {blocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                              </button>
+                            )}
                           </div>
-                        ))}
+                        );
+                      })}
 
-                        {timeRows.map((minutes) => (
+                      {(() => {
+                        const step = workingHours.slotMinutes || 15;
+                        const rows = [];
+                        for (let m = workingHours.startHour * 60; m < workingHours.endHour * 60; m += step) {
+                          rows.push(m);
+                        }
+                        return rows.map((minutes) => (
                           <Fragment key={minutes}>
                             <div className="bg-white text-right pr-2 text-[10px] text-muted-foreground pt-1">
                               {minutes % 60 === 0
@@ -406,19 +594,23 @@ export default function Booking() {
                                   })
                                 : ""}
                             </div>
-                            {weekFreeSlotsByDay.map(({ day, isOff, freeStarts }) => {
+                            {weekDays.map((day) => {
+                              const key = dateKey(day);
                               const slotStart = new Date(startOfDay(day).getTime() + minutes * 60000);
-                              const isFree = !isOff && freeStarts.has(slotStart.getTime());
+                              const slotEnd = new Date(slotStart.getTime() + duration * 60000);
+                              const isFree = (slotsByDay.get(key) || []).some(
+                                (s) => s.start.getTime() === slotStart.getTime()
+                              );
                               const isSelected =
                                 selectedSlot && selectedSlot.start.getTime() === slotStart.getTime();
                               return (
                                 <button
-                                  key={day.toISOString() + minutes}
+                                  key={key + minutes}
                                   type="button"
                                   disabled={!isFree}
-                                  onClick={() => handleSelectWeekSlot(day, minutes)}
-                                  title={isFree ? formatTime(slotStart) : "Busy"}
-                                  className={`h-6 transition-colors ${
+                                  onClick={() => setSelectedSlot({ start: slotStart, end: slotEnd })}
+                                  title={isFree ? `${formatTime(slotStart)}–${formatTime(slotEnd)}` : "Busy"}
+                                  className={`h-5 transition-colors ${
                                     isSelected
                                       ? "bg-blue-600"
                                       : isFree
@@ -429,142 +621,81 @@ export default function Booking() {
                               );
                             })}
                           </Fragment>
-                        ))}
-                      </div>
+                        ));
+                      })()}
                     </div>
+                  </div>
 
-                    <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
-                      <span className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded-sm bg-green-50 border border-green-200" /> Free
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded-sm bg-slate-100 border border-slate-200" /> Busy /
-                        unavailable
-                      </span>
+                  <div className="flex items-center gap-4 mt-3 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded-sm bg-green-50 border border-green-200" /> Free
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <span className="w-3 h-3 rounded-sm bg-slate-100 border border-slate-200" /> Busy /
+                      unavailable
+                    </span>
+                  </div>
+
+                  {isLoadingAvailability && (
+                    <div className="flex items-center justify-center gap-2 text-sm text-slate-500 mt-3">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Checking availability...
                     </div>
-
-                    {isLoadingAvailability && (
-                      <div className="flex items-center justify-center gap-2 text-sm text-slate-500 mt-3">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Checking availability...
-                      </div>
-                    )}
-                  </Card>
-
-                  {selectedSlot && (
-                    <Card className="p-4 md:p-6 max-w-md mx-auto">
-                      <RequestForm
-                        selectedDay={selectedDay}
-                        selectedSlot={selectedSlot}
-                        onChooseDifferentTime={() => setSelectedSlot(null)}
-                        form={form}
-                        setForm={setForm}
-                        isSubmitting={isSubmitting}
-                        onSubmit={handleSubmit}
-                      />
-                    </Card>
                   )}
-                </div>
-              ) : (
-                <div className="grid md:grid-cols-2 gap-6">
-                  <Card className="p-4 md:p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <Button variant="ghost" size="icon" onClick={() => changeMonth(-1)} aria-label="Previous month">
-                        <ChevronLeft className="w-4 h-4" />
-                      </Button>
-                      <span className="font-medium text-slate-900">
-                        {month.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
-                      </span>
-                      <Button variant="ghost" size="icon" onClick={() => changeMonth(1)} aria-label="Next month">
-                        <ChevronRight className="w-4 h-4" />
-                      </Button>
-                    </div>
+                </Card>
 
-                    <div className="grid grid-cols-7 gap-1 text-center text-xs text-muted-foreground mb-2">
-                      {WEEKDAY_LABELS.map((label) => (
-                        <div key={label}>{label}</div>
-                      ))}
-                    </div>
-
-                    <div className="grid grid-cols-7 gap-1">
-                      {monthCells.map((day, i) => {
-                        if (!day) return <div key={i} />;
-                        const disabled = isDayDisabled(day);
-                        const selected = isSameDay(day, selectedDay);
-                        return (
-                          <button
-                            key={i}
-                            type="button"
-                            disabled={disabled}
-                            onClick={() => handleSelectDay(day)}
-                            className={`h-9 rounded-md text-sm transition-colors ${
-                              selected
-                                ? "bg-blue-600 text-white"
-                                : disabled
-                                ? "text-muted-foreground opacity-40 cursor-not-allowed"
-                                : "hover:bg-blue-50 text-slate-900"
-                            }`}
-                          >
-                            {day.getDate()}
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {isLoadingAvailability && (
-                      <div className="flex items-center justify-center gap-2 text-sm text-slate-500 mt-3">
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Checking availability...
-                      </div>
-                    )}
+                {selectedSlot && (
+                  <Card className="p-4 md:p-6 max-w-md mx-auto">
+                    <RequestForm
+                      selectedSlot={selectedSlot}
+                      onChooseDifferentTime={() => setSelectedSlot(null)}
+                      form={form}
+                      setForm={setForm}
+                      isSubmitting={isSubmitting}
+                      onSubmit={handleSubmit}
+                    />
                   </Card>
-
-                  <Card className="p-4 md:p-6">
-                    {!selectedDay && (
-                      <div className="h-full flex items-center justify-center text-slate-500 text-sm text-center py-12">
-                        Select an available day to see open time slots.
-                      </div>
-                    )}
-
-                    {selectedDay && !selectedSlot && (
-                      <div>
-                        <h3 className="font-semibold text-slate-900 mb-3">{formatDay(selectedDay)}</h3>
-                        {daySlots.length === 0 ? (
-                          <p className="text-sm text-slate-500">No open slots this day.</p>
-                        ) : (
-                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                            {daySlots.map((slot) => (
-                              <Button
-                                key={slot.start.toISOString()}
-                                variant="outline"
-                                className="flex items-center gap-1.5"
-                                onClick={() => setSelectedSlot(slot)}
-                              >
-                                <Clock className="w-3.5 h-3.5" />
-                                {formatTime(slot.start)}
-                              </Button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {selectedSlot && (
-                      <RequestForm
-                        selectedDay={selectedDay}
-                        selectedSlot={selectedSlot}
-                        onChooseDifferentTime={() => setSelectedSlot(null)}
-                        form={form}
-                        setForm={setForm}
-                        isSubmitting={isSubmitting}
-                        onSubmit={handleSubmit}
-                      />
-                    )}
-                  </Card>
-                </div>
-              )}
+                )}
+              </div>
             </>
           )}
+
+          <div className="mt-10 text-center">
+            {!isAdmin ? (
+              showAdminLogin ? (
+                <form onSubmit={handleAdminLogin} className="inline-flex items-center gap-2">
+                  <Input
+                    type="password"
+                    placeholder="Owner token"
+                    value={adminTokenInput}
+                    onChange={(e) => setAdminTokenInput(e.target.value)}
+                    className="w-40 h-8 text-xs"
+                  />
+                  <Button type="submit" size="sm">
+                    Sign in
+                  </Button>
+                </form>
+              ) : (
+                <button
+                  type="button"
+                  className="text-xs text-slate-400 hover:text-slate-600 underline"
+                  onClick={() => setShowAdminLogin(true)}
+                >
+                  Owner? Manage availability
+                </button>
+              )
+            ) : (
+              <div className="inline-flex items-center gap-3 text-xs text-slate-500">
+                <span className="inline-flex items-center gap-1 text-blue-600 font-medium">
+                  <Lock className="w-3 h-3" /> Owner mode
+                </span>
+                <button type="button" className="underline" onClick={handleAdminLogout}>
+                  Sign out
+                </button>
+              </div>
+            )}
+            {adminError && <p className="text-xs text-red-600 mt-1">{adminError}</p>}
+          </div>
         </div>
       </section>
     </>

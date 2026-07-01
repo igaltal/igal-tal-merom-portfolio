@@ -86,27 +86,45 @@ to do here.
    they only block their first occurrence - avoid relying on a recurring
    iCloud event to block time (use Google Calendar for that instead).
 
-## 4. Add environment variables in Vercel
+## 4. Owner mode (block/unblock days from the page itself)
+
+You can also close a day right from `/booking`, without opening Google
+Calendar. Pick any long, random string as `ADMIN_TOKEN` (e.g. generate one
+with `openssl rand -hex 24`) and add it as a Vercel env var.
+
+To sign in as the owner, visit `https://igaltal.com/booking?admin=YOUR_TOKEN`
+once - the token is then remembered in that browser (localStorage) and the
+URL is cleaned up automatically. A small "Owner mode" badge appears, and a
+lock icon shows next to each day so you can block/unblock it with one click.
+Blocking a day just creates a real all-day "Blocked (via booking page)" event
+on your Google Calendar, so it stays in sync even if you delete that event
+manually. "Sign out" (shown next to the badge) forgets the token on that
+device only.
+
+## 5. Add environment variables in Vercel
 
 In the Vercel dashboard for this project (the same one serving the site),
 add:
 
 `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REFRESH_TOKEN`,
-`GOOGLE_CALENDAR_ID` (defaults to `primary`), and optionally `APPLE_ID`,
-`APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_CALDAV_URL`.
+`GOOGLE_CALENDAR_ID` (defaults to `primary`), `ADMIN_TOKEN`, and optionally
+`APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_CALDAV_URL`.
 
 Redeploy after adding them (or they'll apply on the next deploy).
 
 ## Day-to-day use
 
-- **Block a day off**: just add an event on your Google Calendar like you
-  always do - the booking page automatically treats it as busy.
+- **Block a day off**: either use owner mode on `/booking` (see above), or
+  just add an event on your Google Calendar like you always do - either way
+  the booking page treats it as busy.
 - **Approve/decline a request**: when someone requests a time, a tentative
   (yellow) event titled "Meeting request: <name>" appears on your Google
   Calendar, with their email and message in the description. Confirm it in
   Google Calendar to accept, or delete it to decline. The requester already
   received a "pending confirmation" email; follow up with them directly to
   finalize.
+- **Meeting length**: visitors choose 15 min, 30 min, 1 hour, or 2 hours on
+  the page itself - there's nothing to configure for that.
 
 ## Note on the standalone `booking-server` Vercel project
 

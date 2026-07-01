@@ -1,6 +1,6 @@
-// Owner-configurable availability rules. Edit these directly - no admin UI.
-// To block a specific day off, just add an event on your Google Calendar for
-// that day; it will automatically show as busy without any change here.
+// Owner-configurable availability rules. Edit these directly, or block a
+// single day from the booking page itself (see api/block-day.js) - either
+// way it's a real Google Calendar event, so there's nothing else to sync.
 
 export const TIMEZONE = "Asia/Jerusalem";
 
@@ -9,7 +9,11 @@ export const WORKING_DAYS = [0, 1, 2, 3, 4]; // Sunday - Thursday
 
 export const START_HOUR = 9; // 09:00
 export const END_HOUR = 18; // 18:00
-export const SLOT_MINUTES = 30;
+
+// Smallest start-time increment the calendar grid snaps to. Visitors can
+// still book any duration (15/30/60/120 min - see DURATIONS in Booking.jsx);
+// this only controls which start times are considered.
+export const SLOT_MINUTES = 15;
 
 // Don't allow booking a slot less than this many hours from now.
 export const MIN_NOTICE_HOURS = 12;
