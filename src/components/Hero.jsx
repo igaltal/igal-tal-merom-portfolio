@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowDown, Github, Linkedin, Mail, Code, Rocket, Star } from "lucide-react";
+import { ArrowDown, Github, Linkedin, Mail, Code, Rocket, Star, Palette } from "lucide-react";
 import { motion } from "framer-motion";
 import { profile, asset } from "@/content";
 
@@ -148,6 +148,15 @@ export default function Hero() {
             >
               <Linkedin className="w-4 md:w-5 h-4 md:h-5 mr-2" aria-hidden="true" />
               LinkedIn
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              className="w-full sm:w-auto bg-white/10 backdrop-blur-xl border-white/20 text-white hover:bg-white/20 hover:border-white/30 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+              onClick={() => openExternal(social.uiuxPortfolio)}
+            >
+              <Palette className="w-4 md:w-5 h-4 md:h-5 mr-2" aria-hidden="true" />
+              UI/UX Portfolio
             </Button>
             <Button
               size="lg"

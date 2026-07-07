@@ -10,6 +10,7 @@
 import {
   Code, Rocket, Users, Zap, Cpu, Lightbulb, TrendingUp, Dumbbell,
   GraduationCap, ShoppingCart, Star, Sparkles, FileText, Video, Presentation,
+  Palette,
 } from "lucide-react";
 
 import profile from "./profile.json";
@@ -23,6 +24,7 @@ import startupIdeas from "./startup-ideas.json";
 const ICONS = {
   Code, Rocket, Users, Zap, Cpu, Lightbulb, TrendingUp, Dumbbell,
   GraduationCap, ShoppingCart, Star, Sparkles, FileText, Video, Presentation,
+  Palette,
 };
 
 /** Resolve an icon name from content into a lucide-react component (falls back to Star). */

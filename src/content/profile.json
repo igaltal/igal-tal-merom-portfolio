@@ -1,6 +1,6 @@
 {
   "name": "Igal Tal Merom",
-  "role": "Software Engineer @ Voltify",
+  "role": "AI & UI/UX Software Engineer",
   "location": "Kiryat Ono, Israel",
   "email": "igaltalmerom@gmail.com",
   "phone": "+972-522-491312",
@@ -8,39 +8,40 @@
   "photo": "assets/images/igal-photo.jpg",
   "social": {
     "github": "https://github.com/igaltal",
-    "linkedin": "https://www.linkedin.com/in/igal-tal-merom-a6874a180/"
+    "linkedin": "https://www.linkedin.com/in/igal-tal-merom-a6874a180/",
+    "uiuxPortfolio": "https://igaltal.github.io/portfolio/"
   },
   "hero": {
-    "tagline": "Software Engineer @ Voltify",
+    "tagline": "AI & UI/UX Software Engineer — open to opportunities",
     "headlineParts": [
-      { "text": "Distributed Systems", "accent": "blue" },
-      { "text": "Real-time Infrastructure", "accent": "purple" },
-      { "text": "Building reliable systems with Python & C++", "accent": "none" }
+      { "text": "AI-Powered Products", "accent": "blue" },
+      { "text": "UI/UX Engineering", "accent": "purple" },
+      { "text": "Building intelligent, human-centered software", "accent": "none" }
     ]
   },
   "about": {
-    "summary": "Passionate about creating innovative solutions that bridge technology and real-world impact",
+    "summary": "Blending AI engineering with thoughtful UI/UX to build products people love to use",
     "bio": [
-      "Software Engineer specializing in distributed systems and real-time infrastructure, with hands-on experience in Python and C++. I graduated with a B.Sc. in Computer Science & Entrepreneurship from Reichman University.",
-      "At Voltify, I'm responsible for designing and owning a simulation platform and communication layers, enabling validation of complex system behavior before production deployment. I work with Python, C++, Redis, Modbus, and Docker in a Linux environment.",
-      "I have a strong background in performance optimization, production debugging, multi-threaded systems, and CI/CD pipelines (Pytest, Docker, Bitbucket).",
+      "Software Engineer focused on AI-powered products and UI/UX engineering. I love working at the intersection of intelligent systems and human-centered design — from LLM-powered features to the interfaces that make them feel effortless. I hold a B.Sc. in Computer Science & Entrepreneurship from Reichman University.",
+      "Previously at Voltify, I designed and owned a simulation platform and communication layers for distributed control systems, working with Python, C++, Redis, Modbus, and Docker in a Linux environment — a systems foundation that helps me ship AI products that hold up in production.",
+      "On the design side, I craft end-to-end product experiences — research, wireframes, prototypes, and polished UI — using React, Tailwind, and Figma. Selected design work is available in my dedicated UI/UX portfolio.",
       "My journey includes serving as a Combat Soldiers Instructor in the Israeli Air Force and professional experience at the Israeli Consulate in New York, where I handled logistics for high-profile diplomatic operations."
     ],
     "highlights": [
       {
+        "icon": "Sparkles",
+        "title": "AI Product Engineering",
+        "description": "Building AI-powered features with LLM APIs, prompt engineering, and computer vision"
+      },
+      {
+        "icon": "Palette",
+        "title": "UI/UX Design & Engineering",
+        "description": "Designing human-centered interfaces and shipping them with React, Tailwind, and Figma"
+      },
+      {
         "icon": "Code",
-        "title": "Software Engineer @ Voltify",
-        "description": "Designing simulation platforms and communication layers for distributed control systems"
-      },
-      {
-        "icon": "Zap",
-        "title": "Distributed Systems",
-        "description": "Real-time infrastructure, multi-threading, async systems, and production debugging"
-      },
-      {
-        "icon": "Rocket",
-        "title": "Builder & Entrepreneur",
-        "description": "CS & Entrepreneurship graduate building AI-powered and automation tools"
+        "title": "Strong Engineering Foundation",
+        "description": "Distributed systems, real-time infrastructure, and production debugging with Python & C++"
       },
       {
         "icon": "Users",
@@ -49,10 +50,10 @@
       }
     ],
     "skills": [
-      { "category": "Languages", "items": ["Python", "C++", "C", "C#", "Java", "SQL"] },
-      { "category": "Frameworks & Tools", "items": ["React", "Flask", "Docker", "Pytest", "Git", "Linux", "Selenium", "SQLite"] },
-      { "category": "Protocols & Systems", "items": ["Modbus", "Redis", "TCP/IP", "RS-485"] },
-      { "category": "AI & ML", "items": ["OpenAI APIs", "Scikit-learn", "OpenCV", "Prompt Engineering", "Computer Vision"] }
+      { "category": "AI & ML", "items": ["OpenAI APIs", "Claude API", "Prompt Engineering", "Scikit-learn", "OpenCV", "Computer Vision"] },
+      { "category": "UI/UX & Frontend", "items": ["Figma", "React", "Tailwind CSS", "Design Systems", "Prototyping", "User Research"] },
+      { "category": "Languages", "items": ["Python", "JavaScript", "C++", "C", "C#", "Java", "SQL"] },
+      { "category": "Frameworks & Tools", "items": ["Flask", "Docker", "Pytest", "Git", "Linux", "Selenium", "SQLite", "Redis"] }
     ]
   }
 }

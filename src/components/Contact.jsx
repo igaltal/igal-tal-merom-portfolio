@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { motion } from "framer-motion";
-import { Mail, Phone, MapPin, Send, Github, Linkedin, Download } from "lucide-react";
+import { Mail, Phone, MapPin, Send, Github, Linkedin, Download, Palette } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { z } from "zod";
 import { profile, asset } from "@/content";
@@ -83,6 +83,7 @@ export default function Contact() {
   const socialLinks = [
     { icon: <Linkedin className="w-5 h-5" aria-hidden="true" />, label: "LinkedIn", href: profile.social.linkedin },
     { icon: <Github className="w-5 h-5" aria-hidden="true" />, label: "GitHub", href: profile.social.github },
+    { icon: <Palette className="w-5 h-5" aria-hidden="true" />, label: "UI/UX Portfolio", href: profile.social.uiuxPortfolio },
   ];
 
   return (

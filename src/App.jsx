@@ -15,7 +15,7 @@ const Toaster = lazy(() => import("./components/ui/toaster").then((m) => ({ defa
 const Booking = lazy(() => import("./pages/Booking"));
 
 const description =
-  "Igal Tal Merom — Software Engineer building distributed systems and real-time infrastructure with Python & C++. CS & Entrepreneurship graduate, builder, and founder.";
+  "Igal Tal Merom — Software Engineer specializing in AI-powered products and UI/UX engineering. Building intelligent, human-centered software with React, Python, and LLM APIs.";
 
 function App() {
   const isBooking = window.location.pathname.replace(/\/$/, '') === '/booking';
@@ -42,7 +42,7 @@ function App() {
   return (
     <>
       <Seo
-        title="Igal Tal Merom — Software Engineer & Builder"
+        title="Igal Tal Merom — AI & UI/UX Software Engineer"
         description={description}
         path="/"
         type="profile"
