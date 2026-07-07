@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 210mm; height: 297mm; }
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    font-size: 9.2pt;
+    line-height: 1.45;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page { width: 210mm; height: 297mm; display: flex; flex-direction: column; overflow: hidden; background: #fff; }
+
+  /* Header */
+  .header {
+    background: #0f172a; color: #fff;
+    padding: 7mm 12mm 5.5mm;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .header h1 { font-size: 19pt; font-weight: 700; letter-spacing: 0.3px; }
+  .header .role { font-size: 10.5pt; color: #93c5fd; font-weight: 600; margin-top: 1mm; }
+  .header .contact { text-align: right; font-size: 8pt; line-height: 1.55; color: #cbd5e1; }
+  .header .contact a { color: #e2e8f0; text-decoration: none; }
+  .header .contact .links a { color: #93c5fd; }
+
+  /* Body */
+  .body { flex: 1; display: flex; min-height: 0; }
+  .main { flex: 1; padding: 4.5mm 6mm 4mm 12mm; }
+  .side { width: 60mm; background: #f1f5f9; padding: 4.5mm 6mm 4mm; border-left: 1px solid #e2e8f0; }
+
+  h2 {
+    font-size: 9.2pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px;
+    color: #1d4ed8; border-bottom: 1.5px solid #1d4ed8;
+    padding-bottom: 0.8mm; margin: 4.2mm 0 2.4mm;
+  }
+  h2:first-child { margin-top: 0; }
+
+  .summary { font-size: 9.4pt; color: #334155; }
+
+  .job { margin-bottom: 3.4mm; }
+  .job-head { display: flex; justify-content: space-between; align-items: baseline; }
+  .job-title { font-weight: 700; font-size: 9.8pt; }
+  .job-title .co { color: #1d4ed8; }
+  .job-meta { font-size: 8.2pt; color: #64748b; white-space: nowrap; }
+  ul { margin: 1mm 0 0 4mm; }
+  li { margin-bottom: 0.8mm; color: #334155; }
+
+  .proj { margin-bottom: 2.4mm; }
+  .proj b { font-size: 9.4pt; }
+  .proj .tech { color: #1d4ed8; font-size: 8.2pt; font-weight: 600; }
+  .proj p { color: #334155; margin-top: 0.3mm; }
+
+  /* Side column */
+  .side h2 { border-color: #94a3b8; color: #0f172a; }
+  .skill-group { margin-bottom: 2.8mm; }
+  .skill-group b { display: block; font-size: 8.6pt; color: #0f172a; margin-bottom: 0.8mm; }
+  .tags { display: flex; flex-wrap: wrap; gap: 1.1mm; }
+  .tag {
+    background: #fff; border: 1px solid #cbd5e1; border-radius: 2mm;
+    padding: 0.4mm 1.9mm; font-size: 7.9pt; color: #334155;
+  }
+  .side p { color: #334155; font-size: 8.6pt; }
+  .side .item { margin-bottom: 2.2mm; }
+  .side .item b { font-size: 8.8pt; }
+  .side .item .meta { font-size: 7.9pt; color: #64748b; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div>
+      <h1>Igal Tal Merom</h1>
+      <div class="role">Software Engineer · AI &amp; UI/UX</div>
+    </div>
+    <div class="contact">
+      Kiryat Ono, Israel · +972-52-2491312<br/>
+      <a href="mailto:talm13124@gmail.com">talm13124@gmail.com</a> · <a href="https://igaltal.com">igaltal.com</a><br/>
+      <span class="links">
+        <a href="https://www.linkedin.com/in/igal-tal-merom-a6874a180/">linkedin.com/in/igal-tal-merom</a> ·
+        <a href="https://github.com/igaltal">github.com/igaltal</a><br/>
+        UI/UX Portfolio: <a href="https://igaltal.github.io/portfolio/">igaltal.github.io/portfolio</a>
+      </span>
+    </div>
+  </div>
+
+  <div class="body">
+    <div class="main">
+      <h2>Summary</h2>
+      <p class="summary">
+        Software engineer with production experience building real-time systems in Python and C++, now focused on
+        AI-powered products and UI/UX engineering. I build LLM-powered features end to end — from prompt design and
+        API integration to polished React interfaces — backed by a strong systems foundation from industrial-grade
+        infrastructure work. B.Sc. in Computer Science &amp; Entrepreneurship.
+      </p>
+
+      <h2>Experience</h2>
+      <div class="job">
+        <div class="job-head">
+          <span class="job-title"><span class="co">Voltify</span> — Software Engineer</span>
+          <span class="job-meta">Sep 2024 – 2026 · Ramat Gan, Israel</span>
+        </div>
+        <ul>
+          <li>Designed and owned a simulation platform emulating hardware behavior, enabling validation of complex system behavior and failure recovery before production deployment.</li>
+          <li>Developed device communication layers in C and C++ for industrial systems over custom protocols (Modbus, RS-485, TCP/IP).</li>
+          <li>Deployed and debugged services on remote Linux environments with Docker; built CI/CD pipelines with Pytest and Bitbucket.</li>
+          <li>Collaborated with infrastructure and firmware engineers on integration, performance optimization, and production debugging of multi-threaded systems.</li>
+        </ul>
+      </div>
+      <div class="job">
+        <div class="job-head">
+          <span class="job-title"><span class="co">Reichman University</span> — Academic Coordinator</span>
+          <span class="job-meta">Aug 2023 – 2025 · Herzliya, Israel</span>
+        </div>
+        <ul>
+          <li>Supported 600+ CS students through academic guidance, mentorship, and onboarding; organized technical workshops and bridged students and faculty.</li>
+        </ul>
+      </div>
+      <div class="job">
+        <div class="job-head">
+          <span class="job-title"><span class="co">Consulate General of Israel</span> — Assistant to General Manager</span>
+          <span class="job-meta">Dec 2021 – Aug 2022 · New York, USA</span>
+        </div>
+        <ul>
+          <li>Coordinated logistics for high-profile diplomatic events; streamlined planning processes, reducing preparation times by 30%.</li>
+        </ul>
+      </div>
+
+      <h2>Selected Projects</h2>
+      <div class="proj">
+        <b>Relay</b> · <span class="tech">Next.js, TypeScript, AI Agents</span>
+        <p>AI agent platform: point an agent at a repo — it reads the code, writes the fix, and ships it.</p>
+      </div>
+      <div class="proj">
+        <b>Personal Site &amp; Booking Platform</b> · <span class="tech">React, Tailwind, Vercel Serverless</span>
+        <p>Designed and built igaltal.com end to end, including a custom meeting-booking system with availability, flexible durations, and a mobile-first UI.</p>
+      </div>
+      <div class="proj">
+        <b>AI Stock Analyst</b> · <span class="tech">Python, AI/ML, Real-time Data</span>
+        <p>AI-driven financial analysis tool delivering data-driven insights from live market data.</p>
+      </div>
+      <div class="proj">
+        <b>BEAM CTRL</b> · <span class="tech">Python, WebSocket, JavaScript</span>
+        <p>Real-time DMX lighting control from any browser — live sliders, cue playback, and a mobile show mode.</p>
+      </div>
+
+      <h2>Military Service</h2>
+      <div class="job">
+        <div class="job-head">
+          <span class="job-title"><span class="co">Israeli Air Force</span> — Combat Soldiers Instructor</span>
+          <span class="job-meta">Aug 2018 – Apr 2021</span>
+        </div>
+        <ul>
+          <li>Led specialized training programs focused on leadership development; managed classified materials with high accuracy and responsibility.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="side">
+      <h2>Skills</h2>
+      <div class="skill-group">
+        <b>AI &amp; ML</b>
+        <div class="tags">
+          <span class="tag">OpenAI API</span><span class="tag">Claude API</span><span class="tag">Prompt Engineering</span>
+          <span class="tag">LLM Integration</span><span class="tag">Scikit-learn</span><span class="tag">OpenCV</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <b>UI/UX &amp; Frontend</b>
+        <div class="tags">
+          <span class="tag">Figma</span><span class="tag">React</span><span class="tag">Tailwind CSS</span>
+          <span class="tag">Design Systems</span><span class="tag">Prototyping</span><span class="tag">User Research</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <b>Languages</b>
+        <div class="tags">
+          <span class="tag">Python</span><span class="tag">JavaScript</span><span class="tag">C++</span>
+          <span class="tag">C</span><span class="tag">C#</span><span class="tag">Java</span><span class="tag">SQL</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <b>Tools &amp; Systems</b>
+        <div class="tags">
+          <span class="tag">Docker</span><span class="tag">Git</span><span class="tag">Linux</span>
+          <span class="tag">Pytest</span><span class="tag">Flask</span><span class="tag">Redis</span>
+          <span class="tag">TCP/IP</span><span class="tag">Modbus</span>
+        </div>
+      </div>
+
+      <h2>Education</h2>
+      <div class="item">
+        <b>B.Sc. Computer Science &amp; Entrepreneurship</b><br/>
+        <span class="meta">Reichman University · 2022 – 2025</span>
+        <p>GPA: 82 · Courses: Advanced Programming, Web Development, Product Management</p>
+      </div>
+      <div class="item">
+        <b>High School Diploma, CS Major</b><br/>
+        <span class="meta">Amit Bar Ilan · Graduated with Honors (110/115)</span>
+      </div>
+
+      <h2>Certifications</h2>
+      <div class="item">
+        <p>Automate Everything with Python — <b>Udemy</b></p>
+        <p>Excellence in Training &amp; Leadership — <b>IDF</b></p>
+      </div>
+
+      <h2>Volunteering</h2>
+      <div class="item">
+        <b>Ami Hai Pre-Military Academy</b>
+        <p>Led community projects and leadership workshops.</p>
+      </div>
+      <div class="item">
+        <b>URJ Camp Harlam, PA, USA</b>
+        <p>Counselor — mentored youth aged 8–16.</p>
+      </div>
+
+      <h2>Languages</h2>
+      <div class="item">
+        <p><b>Hebrew:</b> Native · <b>English:</b> Fluent<br/><b>Arabic:</b> Basic reading</p>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
